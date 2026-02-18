@@ -50,7 +50,7 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('container', () => ({
-                messages: [],
+                messages: JSON.parse('{{ session.get_history()|tojson|safe }}'),
                 message: '',
                 email: 'jnovakova@gmail.com',
                 password: '',

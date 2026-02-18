@@ -7,8 +7,9 @@
         <h1>Leaderboard</h1>
         <ul>
             {% for session in sessions %}
-                <li>{{ session.user_id }} - {{ session.attempts }} attempts, {{ session.messages_count }} messages</li>
+                <li>{{ session.user_id }} - {{ session.attempts }} pokusů, {{ session.messages_count }} zpráv</li>
             {% endfor %}
         </ul>
+        <button class="start-button" onclick="window.location.assign('/game/new')">Začít novou hru</button>
     {% endcall %}
 {% endblock %}

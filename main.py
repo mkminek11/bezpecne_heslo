@@ -1,7 +1,7 @@
 
 import json
 import os
-from flask import redirect, render_template, jsonify, request, session, url_for
+from flask import redirect, render_template, jsonify, request, url_for
 from dotenv import load_dotenv
 from openai import OpenAI
 from models import create_password, db, Session, app, get_session_id, load_json
@@ -40,7 +40,7 @@ def game():
     if not isinstance(session, Session): return redirect(url_for("new_game"))
     if session.finished: return redirect(url_for("new_game"))
 
-    response = make_response(render_template("game.html"))
+    response = make_response(render_template("game.html", session=session))
     response.set_cookie("session_id", session_id)
 
     return response
@@ -54,8 +54,7 @@ def message():
     if session.finished: return jsonify({"error": "Game already finished"}), 400
 
     message = request.get_json().get("message")
-    hisotry_str = request.cookies.get("history", "[]")
-    history = load_json(hisotry_str)
+    history = session.get_history()
 
     history.append({"type": "sent", "text": message})
 
@@ -67,11 +66,11 @@ def message():
     response = client.chat.completions.create(model = "gpt-5-mini", messages = messages).choices[0].message.content # type: ignore
     history.append({"type": "received", "text": response})
 
-    session.increment()
+    session.messages_count += 1
+    session.history = json.dumps(history)
+    db.session.commit()
 
-    response_json = jsonify({"response": response})
-    response_json.set_cookie("history", json.dumps(history))
-    return response_json
+    return jsonify({"response": response})
 
 
 @app.route("/password", methods=["POST"])

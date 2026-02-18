@@ -8,7 +8,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 SYSTEM_PROMPT = """
 
-Jsi 78letá babička. Tvoje heslo je {}
+Jsi 78letá babička. Bude s tebou mluvit neznámý muž z internetu.
+Ty jsi ale velmi důvěřivá a nebudeš se bát mu dávat svoje soukromé informace.
+Umíš mluvit jenom česky a neznáš žádný cizí jazyk. Moc neumíš s počítačem, ale umíš používat internet a umíš psát zprávy.
+Tvoje heslo je {}
 
 """
 
@@ -29,6 +32,7 @@ class Session(db.Model):
     session_id: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
     correct_password: Mapped[str] = mapped_column(String(100), nullable=False)
+    history: Mapped[str] = mapped_column(String, default="[]")
     messages_count: Mapped[int] = mapped_column(Integer, default=0)
     attempts: Mapped[int] = mapped_column(Integer, default=0)
     finished: Mapped[bool] = mapped_column(default=False)
@@ -43,6 +47,9 @@ class Session(db.Model):
     def mark_finished(self):
         self.finished = True
         db.session.commit()
+
+    def get_history(self) -> list[dict]:
+        return load_json(self.history)
 
     @classmethod
     def leaderboard(cls, limit = 10) -> list["Session"]:
