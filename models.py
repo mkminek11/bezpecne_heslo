@@ -18,7 +18,7 @@ Tvoje heslo je {}
 relatives = [
     ("Pepa", "syn", "1985"),
     ("Vojta", "vnuk", "2012"),
-    ("Anička", "vnučka", "2015"),
+    ("Anička", "vnučka", "2014"),
 ]
 
 app = Flask(__name__)
