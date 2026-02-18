@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <title>Den bezpečného hesla</title>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    </head>
+    <body x-data="container">
+        <div class="window chat-window" x-data="container">
+            <div class="window-header">
+                <p>Chat</p>
+                <div class="window-controls">
+                    <p class="minimize-button">-</p>
+                    <p class="close-button">×</p>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="chat-header">
+                    <div class="profile">
+                        <div class="profile-picture"></div>
+                        <p>Jana Nováková</p>
+                    </div>
+                </div>
+
+                <div class="chat-body">
+                    <div class="chat-messages">
+                        <template x-for="(msg, index) in messages.slice().reverse()" :key="index">
+                            <div class="message" :class="msg.type === 'sent' ? 'sent' : 'received'">
+                                <p x-text="msg.text"></p>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="chat-input">
+                        <div class="typing-indicator" x-show="typing">
+                            <div class="dot" style="animation-delay: 0.0s;">•</div>
+                            <div class="dot" style="animation-delay: 0.2s;">•</div>
+                            <div class="dot" style="animation-delay: 0.4s;">•</div>
+                        </div>
+
+                        <input type="text" placeholder="Napiš zprávu..." x-model="message" @keydown.enter="sendMessage">
+                        <button class="send-button" @click="sendMessage" x-ref="sendButton">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window password-window">
+            <div class="window-header">
+                <p>Facebook</p>
+                <div class="window-controls">
+                    <p class="minimize-button">-</p>
+                    <p class="close-button">×</p>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="fb-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" alt="f">
+                </div>
+                <div class="login-form">
+                    <input type="text" x-model="email" placeholder="Email" readonly>
+                    <input type="password" x-model="password" placeholder="Heslo" autocomplete="off">
+                    <button class="login-button" @click="tryLogin">Přihlásit se</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('container', () => ({
+                    messages: [],
+                    message: '',
+                    email: 'jnovakova@gmail.com',
+                    password: '',
+                    canSend: true,
+                    typing: false,
+
+                    sendMessage() {
+                        if (!this.canSend || this.message.trim() === '') return;
+                        console.log('Odeslaná zpráva:', this.message);
+                        this.canSend = false;
+                        this.messages.push({ text: this.message, type: 'sent' });
+
+                        setTimeout(() => {this.typing = true;}, 500);
+
+                        axios.post('/message', { message: this.message })
+                            .then(response => {
+                                console.log('Odpověď serveru:', response.data);
+                                this.messages.push({ text: response.data.response, type: 'received' });
+                                this.canSend = true;
+                                this.typing = false;
+                            });
+                        this.message = '';
+                    },
+
+                    tryLogin() {
+                        console.log(this.password);
+                        axios.post('/password', { password: this.password })
+                            .then(response => {
+                                console.log('Odpověď serveru:', response.data);
+                            })
+                            .catch(error => {
+                                console.error('Chyba při odesílání hesla:', error);
+                            });
+                    }
+                }));
+            });
+        </script>
+    </body>
+</html>
