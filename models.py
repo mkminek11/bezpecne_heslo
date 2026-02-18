@@ -1,7 +1,7 @@
 
 import random
 import string
-from flask import Flask, session
+from flask import Flask, json, session
 from sqlalchemy import Column, Integer, String, ForeignKey
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import Mapped, mapped_column
@@ -31,6 +31,7 @@ class Session(db.Model):
     correct_password: Mapped[str] = mapped_column(String(100), nullable=False)
     messages_count: Mapped[int] = mapped_column(Integer, default=0)
     attempts: Mapped[int] = mapped_column(Integer, default=0)
+    finished: Mapped[bool] = mapped_column(default=False)
 
     def increment(self):
         self.messages_count += 1
@@ -39,9 +40,13 @@ class Session(db.Model):
     def get_system_prompt(self) -> str:
         return SYSTEM_PROMPT.format(self.correct_password)
 
+    def mark_finished(self):
+        self.finished = True
+        db.session.commit()
+
     @classmethod
-    def leaderboard(cls, limit = 10):
-        return cls.query.order_by(cls.attempts.asc(), cls.messages_count.asc()).limit(limit).all()
+    def leaderboard(cls, limit = 10) -> list["Session"]:
+        return cls.query.where(cls.finished == True).order_by(cls.attempts.asc(), cls.messages_count.asc()).limit(limit).all()
 
 class User(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -55,6 +60,14 @@ def get_session_id():
 def create_password():
     relative = random.choice(relatives)
     return f"{relative[0]}{relative[2]}"
+
+def load_json(history_str: str) -> list[dict]:
+    try:
+        result = json.loads(history_str)
+        if not isinstance(result, list): return []
+        return result
+    except Exception:
+        return []
 
 with app.app_context():
     db.create_all()

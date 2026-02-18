@@ -1,0 +1,15 @@
+
+{% macro window(title, window_class="") %}
+    <div class="window {{ window_class }}">
+        <div class="window-header">
+            <p>{{ title }}</p>
+            <div class="window-controls">
+                <p class="minimize-button">-</p>
+                <p class="close-button">×</p>
+            </div>
+        </div>
+        <div class="window-body">
+            {{ caller() }}
+        </div>
+    </div>
+{% endmacro %}

@@ -1,0 +1,14 @@
+
+{% extends "base.html" %}
+{% import "_window.html" as window %}
+
+{% block content %}
+    {% call window.window("Leaderboard", "leaderboard-window") %}
+        <h1>Leaderboard</h1>
+        <ul>
+            {% for session in sessions %}
+                <li>{{ session.user_id }} - {{ session.attempts }} attempts, {{ session.messages_count }} messages</li>
+            {% endfor %}
+        </ul>
+    {% endcall %}
+{% endblock %}
