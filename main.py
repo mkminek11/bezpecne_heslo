@@ -2,7 +2,7 @@
 import json
 import os
 from flask import redirect, render_template, jsonify, request, url_for
-from dotenv import load_dotenv
+from dotenv import load_dotenv 
 from openai import OpenAI
 from models import create_password, db, Session, app, get_session_id, load_json
 from flask import make_response
