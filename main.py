@@ -19,11 +19,18 @@ def index():
 
 @app.route("/game/new")
 def new_game():
+    fname = request.args.get("fname", "")
+    lname = request.args.get("lname", "")
+    class_name = request.args.get("class", "")
+    if not fname or not lname or not class_name: return redirect(url_for("index"))
+
     session_id = get_session_id()
     session = Session()
     session.session_id = session_id
+    session.fname = fname
+    session.lname = lname
+    session.class_name = class_name
     session.correct_password = create_password()
-    session.user_id = 1
     db.session.add(session)
     db.session.commit()
 
@@ -93,8 +100,11 @@ def password():
 
 @app.route("/leaderboard")
 def leaderboard():
-    sessions = Session.leaderboard()
-    return render_template("leaderboard.html", sessions=sessions)
+    session_id = request.cookies.get("session_id")
+    session = Session.query.filter_by(session_id=session_id).first()
+    if not isinstance(session, Session) or not session.finished: return redirect(url_for("game"))
+    leaderboard = Session.leaderboard()
+    return render_template("leaderboard.html", sessions=leaderboard)
 
 
 if __name__ == "__main__":

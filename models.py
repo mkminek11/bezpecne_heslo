@@ -30,7 +30,9 @@ db = SQLAlchemy(app)
 class Session(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     session_id: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
+    fname: Mapped[str] = mapped_column(String(100), nullable=False)
+    lname: Mapped[str] = mapped_column(String(100), nullable=False)
+    class_name: Mapped[str] = mapped_column(String(100), nullable=False)
     correct_password: Mapped[str] = mapped_column(String(100), nullable=False)
     history: Mapped[str] = mapped_column(String, default="[]")
     messages_count: Mapped[int] = mapped_column(Integer, default=0)
@@ -54,12 +56,6 @@ class Session(db.Model):
     @classmethod
     def leaderboard(cls, limit = 10) -> list["Session"]:
         return cls.query.where(cls.finished == True).order_by(cls.attempts.asc(), cls.messages_count.asc()).limit(limit).all()
-
-class User(db.Model):
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    fname: Mapped[str] = mapped_column(String(100), nullable=False)
-    lname: Mapped[str] = mapped_column(String(100), nullable=False)
-    class_name: Mapped[str] = mapped_column(String(100), nullable=False)
 
 def get_session_id():
     return "".join(random.choices(string.ascii_letters + string.digits, k=16))

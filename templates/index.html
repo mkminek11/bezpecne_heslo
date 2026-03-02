@@ -3,11 +3,53 @@
 {% import "_window.html" as window %}
 
 {% block content %}
-    
-    {% call window.window("Úvod do hry", "index-window") %}
-        <h1>Vítej</h1>
-        <p>V této hře se naučíš, jak podvodníci využívají sociální inženýrství, aby získali přístup k tvým heslům.</p>
-        <p>Budeš komunikovat s virtuální osobou, která ti bude odpovídat a tvým úkolem je získat její heslo.</p>
-        <button class="start-button" onclick="window.location.assign('/game/new')">Začít hru</button>
-    {% endcall %}
+    <div class="container" x-data="container">
+        <dialog x-ref="dialog">
+            <label for="fname">Jméno:</label>
+            <input type="text" id="fname" x-model="fname">
+            <label for="lname">Příjmení:</label>
+            <input type="text" id="lname" x-model="lname">
+            <label for="class">Třída:</label>
+            <input type="text" id="class" x-model="className">
+            <button @click="startGame()">Začít hru</button>
+        </dialog>
+
+        {% call window.window("Úvod do hry", "index-window") %}
+            <h1>Vítej</h1>
+            <p>V této hře se naučíš, jak podvodníci využívají sociální inženýrství, aby získali přístup k tvým heslům.</p>
+            <p>Budeš komunikovat s virtuální osobou, která ti bude odpovídat a tvým úkolem je získat její heslo.</p>
+            <button class="start-button" @click="openDialog()">Začít hru</button>
+        {% endcall %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('container', () => ({
+                fname: '',
+                lname: '',
+                className: '',
+
+                openDialog() {
+                    this.$refs.dialog.showModal();
+                },
+
+                startGame() {
+                    if (!this.fname || !this.lname || !this.className) {
+                        alert('Prosím, vyplň všechny údaje.');
+                        return;
+                    }
+
+                    const params = new URLSearchParams({
+                        fname: this.fname,
+                        lname: this.lname,
+                        class: this.className
+                    });
+
+                    window.location.assign('/game/new?' + params.toString());
+                }
+            }))
+        })
+    </script>
 {% endblock %}
