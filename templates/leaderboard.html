@@ -5,9 +5,13 @@
 {% block content %}
     {% call window.window("Leaderboard", "leaderboard-window") %}
         <h1>Leaderboard</h1>
-        <ul>
+        <ul class="leaderboard">
             {% for session in sessions %}
-                <li>{{ session.user_id }} - {{ session.attempts }} pokusů, {{ session.messages_count }} zpráv</li>
+                <li>
+                    <span class="order">{{ loop.index }}.</span>
+                    <span class="user">{{ session.fname }} {{ session.lname }} ({{ session.class_name }})</span>
+                    <span class="info">{{ session.attempts }} pokusů, {{ session.messages_count }} zpráv</span>
+                </li>
             {% endfor %}
         </ul>
         <button class="start-button" onclick="window.location.assign('/game/new')">Začít novou hru</button>

@@ -85,7 +85,7 @@
                         .then(response => {
                             console.log('Odpověď serveru:', response.data);
                             if (response.data.correct) {
-                                alert('Gratulujeme! Získali jste heslo!');
+                                alert('Gratulujeme! Získali jste heslo.');
                                 window.location.assign('/leaderboard');
                             } else {
                                 alert('Špatné heslo, zkuste to znovu.');
