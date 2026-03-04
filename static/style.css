@@ -229,6 +229,24 @@ input {
     }
 }
 
+dialog {
+    border: 2px solid #444444;
+    border-radius: 10px;
+    background-color: #222222;
+    color: #ffffff;
+    padding: 20px;
+    margin: auto;
+    flex-direction: column;
+    gap: 10px;
+    
+    &:open {display: flex;}
+    & input {margin-top: -5px;}
+    &::backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+    }
+}
+
 @keyframes typing {
     0% {opacity: 0.2;}
     20% {opacity: 1;}
