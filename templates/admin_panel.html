@@ -1,0 +1,52 @@
+
+{% extends "base.html" %}
+{% import "_window.html" as window %}
+
+{% block content %}
+    {% call window.window("Admin Panel", "admin-window") %}
+        <h1>Admin Panel</h1>
+        <div class="sessions">
+            <template x-for="session in sessions">
+                <div class="session">
+                    <p><strong>ID:</strong> <span x-text="session.id"></span></p>
+                    <p><strong>Jméno:</strong> <span x-text="session.fname + ' ' + session.lname"></span></p>
+                    <p><strong>Třída:</strong> <span x-text="session.class"></span></p>
+                    <button @click="deleteSession(session.id)">Smazat</button>
+                    <button @click="viewHistory(session.id)">Zobrazit historii</button>
+                </div>
+            </template>
+        </div>
+    {% endcall %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('container', () => ({
+                sessions: JSON.parse('{{ sessions|tojson|safe }}'),
+
+                deleteSession(id) {
+                    if (!confirm('Opravdu chcete smazat tuto session?')) return;
+
+                    axios.delete(`/admin/session/${id}`)
+                        .then(() => {
+                            this.sessions = this.sessions.filter(s => s.id !== id);
+                        })
+                        .catch(err => {
+                            alert('Chyba při mazání session: ' + err);
+                        });
+                },
+
+                viewHistory(id) {
+                    axios.get(`/admin/session/${id}/history`)
+                        .then(res => {
+                            alert('Historie zpráv:\n\n' + res.data.join('\n'));
+                        })
+                        .catch(err => {
+                            alert('Chyba při načítání historie: ' + err);
+                        });
+                }
+            }))
+        })
+    </script>
+{% endblock %}

@@ -102,6 +102,17 @@ class Session(db.Model):
     def get_history(self) -> list[dict]:
         return load_json(self.history)
 
+    def data(self) -> dict:
+        return {
+            "fname": self.fname,
+            "lname": self.lname,
+            "class_name": self.class_name,
+            "messages_count": self.messages_count,
+            "attempts": self.attempts,
+            "finished": self.finished,
+            "history": self.get_history()
+        }
+
     @classmethod
     def leaderboard(cls, limit = 10) -> list["Session"]:
         return cls.query.where(cls.finished == True).order_by(cls.attempts.asc(), cls.messages_count.asc()).limit(limit).all()
