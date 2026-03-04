@@ -38,13 +38,7 @@
                 },
 
                 viewHistory(id) {
-                    axios.get(`/admin/session/${id}/history`)
-                        .then(res => {
-                            alert('Historie zpráv:\n\n' + res.data.join('\n'));
-                        })
-                        .catch(err => {
-                            alert('Chyba při načítání historie: ' + err);
-                        });
+                    alert(this.sessions.find(s => s.id === id).history.map(h => `${h.type === "sent" ? ">>>" : "<<<"} ${h.text}`).join('\n'));
                 }
             }))
         })

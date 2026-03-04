@@ -104,6 +104,7 @@ class Session(db.Model):
 
     def data(self) -> dict:
         return {
+            "id": self.id,
             "fname": self.fname,
             "lname": self.lname,
             "class_name": self.class_name,

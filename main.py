@@ -129,5 +129,20 @@ def admin_panel():
     return render_template("admin_panel.html", sessions=[session.data() for session in sessions])
 
 
+@app.route("/admin/session/<int:session_id>", methods=["DELETE"])
+def delete_session(session_id):
+    if session.get("admin") != "true":
+        return redirect(url_for("admin_login"))
+
+    session_obj = Session.query.filter_by(session_id=session_id).first()
+    if not isinstance(session_obj, Session):
+        return jsonify({"error": "Session not found"}), 404
+
+    db.session.delete(session_obj)
+    db.session.commit()
+
+    return jsonify({"message": "Session deleted successfully"})
+
+
 if __name__ == "__main__":
     app.run(debug=True)
