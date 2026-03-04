@@ -11,8 +11,8 @@
                     <p><strong>ID:</strong> <span x-text="session.id"></span></p>
                     <p><strong>Jméno:</strong> <span x-text="session.fname + ' ' + session.lname"></span></p>
                     <p><strong>Třída:</strong> <span x-text="session.class"></span></p>
-                    <button @click="deleteSession(session.id)">Smazat</button>
-                    <button @click="viewHistory(session.id)">Zobrazit historii</button>
+                    <button @click="deleteSession(session)">Smazat</button>
+                    <button @click="viewHistory(session)">Zobrazit historii</button>
                 </div>
             </template>
         </div>
@@ -25,8 +25,9 @@
             Alpine.data('container', () => ({
                 sessions: JSON.parse('{{ sessions|tojson|safe }}'),
 
-                deleteSession(id) {
+                deleteSession(session) {
                     if (!confirm('Opravdu chcete smazat tuto session?')) return;
+                    const id = session.id;
 
                     axios.delete(`/admin/session/${id}`)
                         .then(() => {
@@ -37,8 +38,8 @@
                         });
                 },
 
-                viewHistory(id) {
-                    alert(this.sessions.find(s => s.id === id).history.map(h => `${h.type === "sent" ? ">>>" : "<<<"} ${h.text}`).join('\n'));
+                viewHistory(session) {
+                    alert(session.history.map(h => `${h.type === "sent" ? ">>>" : "<<<"} ${h.text}`).join('\n'));
                 }
             }))
         })
