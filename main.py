@@ -134,7 +134,7 @@ def delete_session(session_id):
     if session.get("admin") != "true":
         return redirect(url_for("admin_login"))
 
-    session_obj = Session.query.filter_by(session_id=session_id).first()
+    session_obj = Session.query.filter_by(id=session_id).first()
     if not isinstance(session_obj, Session):
         return jsonify({"error": "Session not found"}), 404
 
