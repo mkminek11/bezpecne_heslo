@@ -79,6 +79,12 @@ input {
     }
 }
 
+.index-window .window-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .chat-window {
     & .window-body {padding: 0px;}
 

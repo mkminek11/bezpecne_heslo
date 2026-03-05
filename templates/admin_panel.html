@@ -10,7 +10,7 @@
                 <div class="session">
                     <p><strong>ID:</strong> <span x-text="session.id"></span></p>
                     <p><strong>Jméno:</strong> <span x-text="session.fname + ' ' + session.lname"></span></p>
-                    <p><strong>Třída:</strong> <span x-text="session.class"></span></p>
+                    <p><strong>Třída:</strong> <span x-text="session.class_name"></span></p>
                     <button @click="deleteSession(session)">Smazat</button>
                     <button @click="viewHistory(session)">Zobrazit historii</button>
                 </div>
@@ -23,7 +23,18 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('container', () => ({
-                sessions: JSON.parse('{{ sessions|tojson|safe }}'),
+                sessions: [],
+
+                init() {
+                    axios.get('/admin/sessions')
+                        .then(response => {
+                            console.log(response.data.sessions[2]);
+                            this.sessions = response.data.sessions;
+                        })
+                        .catch(err => {
+                            alert('Chyba při načítání session: ' + err);
+                        });
+                },
 
                 deleteSession(session) {
                     if (!confirm('Opravdu chcete smazat tuto session?')) return;
@@ -39,7 +50,14 @@
                 },
 
                 viewHistory(session) {
-                    alert(session.history.map(h => `${h.type === "sent" ? ">>>" : "<<<"} ${h.text}`).join('\n'));
+                    axios.get(`/admin/session/${session.id}`)
+                        .then(response => {
+                            const history = response.data.history;
+                            alert(history.map(h => `${h.type === "sent" ? ">>>" : "<<<"} ${h.text}`).join('\n'));
+                        })
+                        .catch(err => {
+                            alert('Chyba při načítání historie: ' + err);
+                        });
                 }
             }))
         })
