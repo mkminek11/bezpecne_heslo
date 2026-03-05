@@ -68,7 +68,7 @@
                     this.canSend = false;
                     this.messages.push({ text: this.message, type: 'sent' });
 
-                    setTimeout(() => {this.typing = true;}, 500);
+                    this.typing = true;
 
                     axios.post('/message', { message: this.message })
                         .then(response => {

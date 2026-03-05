@@ -162,7 +162,7 @@ def get_session(session_id):
     if not isinstance(session_obj, Session):
         return jsonify({"error": "Session not found"}), 404
 
-    return jsonify({"history": session_obj.get_history()})
+    return jsonify({"session": session_obj.data() | {"history": session_obj.get_history(), "password": session_obj.correct_password}})
 
 
 if __name__ == "__main__":

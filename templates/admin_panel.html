@@ -3,19 +3,35 @@
 {% import "_window.html" as window %}
 
 {% block content %}
+    <dialog x-ref="dialog">
+        <h1>Detail chatu</h1>
+        <p><strong>Jméno:</strong> <span x-text="selectedSession.fname + ' ' + selectedSession.lname"></span></p>
+        <p><strong>Třída:</strong> <span x-text="selectedSession.class_name"></span></p>
+        <p><strong>Správné heslo:</strong> <span x-text="selectedSession.password"></span></p>
+        <p><b>Historie:</b></p>
+        <ul>
+            <template x-for="message in selectedSession.history">
+                <li :class="message.type === 'sent' ? 'sent' : 'received'">
+                    <span x-text="message.text"></span>
+                </li>
+            </template>
+        </ul>
+        <button @click="closeDialog()">Zavřít</button>
+    </dialog>
+
     {% call window.window("Admin Panel", "admin-window") %}
         <h1>Admin Panel</h1>
-        <div class="sessions">
+        <ul class="sessions">
             <template x-for="session in sessions">
-                <div class="session">
+                <li class="session">
                     <p><strong>ID:</strong> <span x-text="session.id"></span></p>
                     <p><strong>Jméno:</strong> <span x-text="session.fname + ' ' + session.lname"></span></p>
                     <p><strong>Třída:</strong> <span x-text="session.class_name"></span></p>
                     <button @click="deleteSession(session)">Smazat</button>
-                    <button @click="viewHistory(session)">Zobrazit historii</button>
-                </div>
+                    <button @click="viewDetail(session)">Detail</button>
+                </li>
             </template>
-        </div>
+        </ul>
     {% endcall %}
 {% endblock %}
 
@@ -24,6 +40,8 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('container', () => ({
                 sessions: [],
+                selectedSession: {},
+                interval: null,
 
                 init() {
                     axios.get('/admin/sessions')
@@ -49,15 +67,30 @@
                         });
                 },
 
-                viewHistory(session) {
-                    axios.get(`/admin/session/${session.id}`)
+                viewDetail(session) {
+                    let id = session.id;
+                    axios.get(`/admin/session/${id}`)
                         .then(response => {
-                            const history = response.data.history;
-                            alert(history.map(h => `${h.type === "sent" ? ">>>" : "<<<"} ${h.text}`).join('\n'));
+                            this.selectedSession = response.data.session;
+                            this.$refs.dialog.showModal();
+                            this.interval = setInterval(() => {
+                                axios.get(`/admin/session/${id}`)
+                                    .then(response => {
+                                        this.selectedSession = response.data.session;
+                                    })
+                                    .catch(err => {
+                                        alert('Chyba při načítání detailu session: ' + err);
+                                    });
+                            }, 5000);
                         })
                         .catch(err => {
-                            alert('Chyba při načítání historie: ' + err);
+                            alert('Chyba při načítání detailu session: ' + err);
                         });
+                },
+
+                closeDialog() {
+                    this.$refs.dialog.close();
+                    clearInterval(this.interval);
                 }
             }))
         })
