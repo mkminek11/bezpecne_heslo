@@ -4,15 +4,16 @@ import os
 from flask import redirect, render_template, jsonify, request, url_for, session
 from dotenv import load_dotenv 
 from openai import OpenAI
-from models import create_password, db, Session, app, get_session_id, load_json
-from flask import make_response
+from models import create_password, db, Session, app, get_session_id
 
 load_dotenv()
 API_KEY = os.getenv("chatgpt_key")
 ADMIN_PASSWORD = os.getenv("password")
 app.config['SECRET_KEY'] = os.getenv("secret_key")
+SECRET_CODE = os.getenv("secret_code")
 
 client = OpenAI(api_key = API_KEY)
+
 
 @app.route("/")
 def index():
@@ -70,7 +71,10 @@ def message():
         *[{"role": "user" if m["type"] == "sent" else "assistant", "content": m["text"]} for m in history]
     ]
 
-    response = client.chat.completions.create(model = "gpt-5-mini", messages = messages).choices[0].message.content # type: ignore
+    if message == SECRET_CODE:
+        response = session_obj.correct_password
+    else:
+        response = client.chat.completions.create(model = "gpt-5-mini", messages = messages).choices[0].message.content # type: ignore
     history.append({"type": "received", "text": response})
 
     session_obj.messages_count += 1
@@ -100,11 +104,8 @@ def password():
 
 @app.route("/leaderboard")
 def leaderboard():
-    session_id = session.get("session_id")
-    session_obj = Session.query.filter_by(session_id=session_id).first()
-    if not isinstance(session_obj, Session) or not session_obj.finished: return redirect(url_for("game"))
     leaderboard = Session.leaderboard()
-    return render_template("leaderboard.html", sessions=leaderboard)
+    return render_template("leaderboard.html", sessions = leaderboard)
 
 
 @app.route("/admin/login", methods=["GET", "POST"])
@@ -125,8 +126,16 @@ def admin_panel():
     if session.get("admin") != "true":
         return redirect(url_for("admin_login"))
     
-    sessions = Session.query.all()
-    return render_template("admin_panel.html", sessions=[session.data() for session in sessions])
+    return render_template("admin_panel.html")
+
+
+@app.route("/admin/sessions")
+def admin_sessions():
+    if session.get("admin") != "true":
+        return redirect(url_for("admin_login"))
+
+    sessions = Session.query.order_by(Session.id.desc()).all()
+    return jsonify({"sessions": [s.data() for s in sessions]})
 
 
 @app.route("/admin/session/<int:session_id>", methods=["DELETE"])
@@ -142,6 +151,18 @@ def delete_session(session_id):
     db.session.commit()
 
     return jsonify({"message": "Session deleted successfully"})
+
+
+@app.route("/admin/session/<int:session_id>")
+def get_session(session_id):
+    if session.get("admin") != "true":
+        return redirect(url_for("admin_login"))
+
+    session_obj = Session.query.filter_by(id=session_id).first()
+    if not isinstance(session_obj, Session):
+        return jsonify({"error": "Session not found"}), 404
+
+    return jsonify({"history": session_obj.get_history()})
 
 
 if __name__ == "__main__":

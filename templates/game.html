@@ -42,6 +42,7 @@
             <input type="text" x-model="email" placeholder="Email" readonly>
             <input type="password" x-model="password" placeholder="Heslo" autocomplete="off">
             <button class="login-button" @click="tryLogin">Přihlásit se</button>
+            <textarea class="hidden" x-ref="messages">{{ session.get_history()|tojson|safe }}</textarea>
         </div>
     {% endcall %}
 {% endblock %}
@@ -50,12 +51,16 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('container', () => ({
-                messages: JSON.parse('{{ session.get_history()|tojson|safe }}'),
+                messages: [],
                 message: '',
                 email: 'jnovakova@gmail.com',
                 password: '',
                 canSend: true,
                 typing: false,
+
+                init() {
+                    this.messages = JSON.parse(this.$refs.messages.textContent);
+                },
 
                 sendMessage() {
                     if (!this.canSend || this.message.trim() === '') return;
