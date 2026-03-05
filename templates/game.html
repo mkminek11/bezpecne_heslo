@@ -60,6 +60,7 @@
 
                 init() {
                     this.messages = JSON.parse(this.$refs.messages.textContent);
+                    this.$el.classList.add('game-container');
                 },
 
                 sendMessage() {

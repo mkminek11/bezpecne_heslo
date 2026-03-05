@@ -3,25 +3,23 @@
 {% import "_window.html" as window %}
 
 {% block content %}
-    <div class="container" x-data="container">
-        <dialog x-ref="dialog">
-            <label for="fname">Jméno:</label>
-            <input type="text" id="fname" x-model="fname">
-            <label for="lname">Příjmení:</label>
-            <input type="text" id="lname" x-model="lname">
-            <label for="class">Třída:</label>
-            <input type="text" id="class" x-model="className">
-            <button @click="startGame()">Začít hru</button>
-        </dialog>
+    <dialog x-ref="dialog">
+        <label for="fname">Jméno:</label>
+        <input type="text" id="fname" x-model="fname">
+        <label for="lname">Příjmení:</label>
+        <input type="text" id="lname" x-model="lname">
+        <label for="class">Třída:</label>
+        <input type="text" id="class" x-model="className">
+        <button @click="startGame()">Začít hru</button>
+    </dialog>
 
-        {% call window.window("Úvod do hry", "index-window") %}
-            <h1>Vítej</h1>
-            <p>V této hře se naučíš, jak podvodníci využívají sociální inženýrství, aby získali přístup k tvým heslům.</p>
-            <p>Budeš komunikovat s virtuální osobou, která ti bude odpovídat a tvým úkolem je získat její heslo.</p>
-            <button class="start-button" @click="openDialog()">Začít hru</button>
-            <button class="leaderboard-button" onclick="window.location.assign('/leaderboard')">Leaderboard</button>
-        {% endcall %}
-    </div>
+    {% call window.window("Úvod do hry", "index-window") %}
+        <h1>Vítej</h1>
+        <p>V této hře se naučíš, jak podvodníci využívají sociální inženýrství, aby získali přístup k tvým heslům.</p>
+        <p>Budeš komunikovat s virtuální osobou, která ti bude odpovídat a tvým úkolem je získat její heslo.</p>
+        <button class="start-button" @click="openDialog()">Začít hru</button>
+        <button class="leaderboard-button" onclick="window.location.assign('/leaderboard')">Leaderboard</button>
+    {% endcall %}
 {% endblock %}
 
 {% block scripts %}

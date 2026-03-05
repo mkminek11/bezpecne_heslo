@@ -12,10 +12,11 @@ body {
     height: 100vh;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 3fr 1fr;
     padding: 10px;
     gap: 10px;
     background-image: url("https://i.pinimg.com/originals/35/58/0d/35580d64b9b883fd0e0678595fc2aefd.gif");
+
+    &.game-container {grid-template-rows: 3fr 1fr;}
 }
 
 button {
