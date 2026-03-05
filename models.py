@@ -109,8 +109,7 @@ class Session(db.Model):
             "class_name": self.class_name,
             "messages_count": self.messages_count,
             "attempts": self.attempts,
-            "finished": self.finished,
-            "history": self.get_history()
+            "finished": self.finished
         }
 
     @classmethod

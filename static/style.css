@@ -27,6 +27,8 @@ button {
     cursor: pointer;
 }
 
+.hidden {display: none;}
+
 input {
     padding: 5px 10px;
     border: 2px solid #444444;
@@ -188,51 +190,62 @@ input {
     }
 }
 
-.leaderboard-window .window-body {
+.leaderboard-window .window-body, .admin-window .window-body {
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
 
-    .leaderboard {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        list-style-type: none;
+.leaderboard, .sessions {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    list-style-type: none;
 
-        & li {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            grid-template-rows: auto auto;
-            gap: 0px 5px;
-            background-color: #222222;
-            padding: 10px;
-            border: 2px solid #444444;
-            border-radius: 5px;
-
-            & .order, & .user {
-                font-weight: 600;
-            }
-
-            & .info {
-                grid-column: 1 / span 2;
-            }
-
-            &:nth-child(1) {
-                background-color: gold;
-                color: #222222;
-            }
-
-            &:nth-child(2) {
-                background-color: silver;
-                color: #222222;
-            }
-
-            &:nth-child(3) {
-                background-color: #cd7f32;
-                color: #222222;
-            }
-        }
+    & li {
+        gap: 0px 5px;
+        background-color: #222222;
+        padding: 10px;
+        border: 2px solid #444444;
+        border-radius: 5px;
     }
+}
+
+.leaderboard li {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    display: grid;
+
+    & .order, & .user {
+        font-weight: 600;
+    }
+
+    & .info {
+        grid-column: 1 / span 2;
+    }
+
+    &:nth-child(1) {
+        background-color: gold;
+        color: #222222;
+    }
+
+    &:nth-child(2) {
+        background-color: silver;
+        color: #222222;
+    }
+
+    &:nth-child(3) {
+        background-color: #cd7f32;
+        color: #222222;
+    }
+}
+
+.sessions {gap: 10px;}
+
+.sessions li {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 dialog {
@@ -256,6 +269,9 @@ dialog {
 .admin-window .window-body {
     overflow-y: auto;
 }
+
+li.sent {list-style-type: "> ";}
+li.received {list-style-type: "< ";}
 
 @keyframes typing {
     0% {opacity: 0.2;}
