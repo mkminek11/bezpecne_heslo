@@ -5,15 +5,19 @@
 {% block content %}
     {% call window.window("Leaderboard", "leaderboard-window") %}
         <h1>Leaderboard</h1>
-        <ul class="leaderboard">
-            {% for session in sessions %}
-                <li>
-                    <span class="order">{{ loop.index }}.</span>
-                    <span class="user">{{ session.fname }} {{ session.lname }} ({{ session.class_name }})</span>
-                    <span class="info">{{ session.attempts }} pokusů, {{ session.messages_count }} zpráv</span>
-                </li>
-            {% endfor %}
-        </ul>
+        {% if sessions %}
+            <ul class="leaderboard">
+                {% for session in sessions %}
+                    <li>
+                        <span class="order">{{ loop.index }}.</span>
+                        <span class="user">{{ session.fname }} {{ session.lname }} ({{ session.class_name }})</span>
+                        <span class="info">{{ session.attempts }} pokusů, {{ session.messages_count }} zpráv</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Zatím nikdo hru nedokončil. Zkus to a buď první!</p>
+        {% endif %}
         <button class="start-button" onclick="window.location.assign('/game/new')">Začít novou hru</button>
     {% endcall %}
 {% endblock %}
